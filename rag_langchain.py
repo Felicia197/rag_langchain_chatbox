@@ -38,13 +38,20 @@ st.markdown("""
 # Title
 st.title("📚 RAG ChatBox: Smart Document Interaction")
 
-# Load environment variables
-load_dotenv()
-api_key = os.environ.get("GOOGLE_API_KEY")
+# Load environment variables (For local run)
+# load_dotenv()
+# api_key = os.environ.get("GOOGLE_API_KEY")
 
-if not api_key:
-    st.error("GOOGLE_API_KEY is not set in the environment variables")
-    st.stop()
+# if not api_key:
+#     st.error("GOOGLE_API_KEY is not set in the environment variables")
+#     st.stop()
+    
+# Check for Google API Key in Streamlit Secrets
+try:
+    api_key = st.secrets["GOOGLE_API_KEY"]
+except KeyError:
+    st.error("Google API Key not found in Streamlit Secrets. Please configure it.")
+    st.stop()    
 
 # Initialize session state
 if 'messages' not in st.session_state:

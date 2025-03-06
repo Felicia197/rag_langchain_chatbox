@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import InMemoryVectorStore
+from langchain_community.vectorstores import FAISS
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
@@ -54,10 +54,12 @@ except KeyError:
     st.stop()    
 
 # Initialize session state
-if 'messages' not in st.session_state:
+if 'messages' not in st.session_state:                 # Store chat history for display
     st.session_state.messages = []
-if 'vectorstore' not in st.session_state:
+
+if 'vectorstore' not in st.session_state:              # Store document embeddings
     st.session_state.vectorstore = None
+    
 
 # Sidebar for document upload
 with st.sidebar:
@@ -124,14 +126,11 @@ with st.sidebar:
         chunks = text_splitter.split_documents(documents)
         
         embeddings = GoogleGenerativeAIEmbeddings(model="models/text-embedding-004")
-        st.session_state.vectorstore = InMemoryVectorStore.from_documents(
+        st.session_state.vectorstore = FAISS.from_documents(
             chunks, 
             embeddings
         )
         st.success("RAG system processed successfully!")
-
-# Main Chat Interface
-# st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 
 # Display chat messages
 for message in st.session_state.messages:
